@@ -1,6 +1,7 @@
 import azure.functions as func
 import pymongo
 from bson.objectid import ObjectId
+from config import Config
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
 
@@ -9,13 +10,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if request:
         try:
-            url = "localhost"  # TODO: Update with appropriate MongoDB connection information
+            url = Config.MONGO_URL
             client = pymongo.MongoClient(url)
-            database = client['azure']
+            database = client[Config.MONGO_DB_NAME]
             collection = database['advertisements']
-            
             filter_query = {'_id': ObjectId(id)}
-            update_query = {"$set": eval(request)}
+            update_query = {"$set": request}
             rec_id1 = collection.update_one(filter_query, update_query)
             return func.HttpResponse(status_code=200)
         except:
